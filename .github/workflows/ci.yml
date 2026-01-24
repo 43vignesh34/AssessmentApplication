@@ -41,3 +41,5 @@ jobs:
           name: springboot-jar
           path: target/*.jar
           if-no-files-found: error
+      - name: Run Unit tests
+        run: mvn -B test
