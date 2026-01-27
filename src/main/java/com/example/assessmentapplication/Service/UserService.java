@@ -8,11 +8,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService
 {
-    @Autowired
-    UserRepository userRepository;
+
 
     @Autowired
-    UserRepository repo;
+    private UserRepository repo;
     public User findByUsername(String username)
     {
         System.out.println(">> username=\"" + username + "\" length=" + username.length());

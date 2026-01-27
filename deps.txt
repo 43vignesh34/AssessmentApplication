@@ -1,0 +1,16 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -----------------< com.example:AssessmentApplication >------------------
+[INFO] Building AssessmentApplication 0.0.2-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- dependency:3.8.1:tree (default-cli) @ AssessmentApplication ---
+[INFO] com.example:AssessmentApplication:jar:0.0.2-SNAPSHOT
+[INFO] \- org.springframework:spring-test:jar:5.1.9.RELEASE:compile
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.411 s
+[INFO] Finished at: 2026-01-27T19:18:25+05:30
+[INFO] ------------------------------------------------------------------------
