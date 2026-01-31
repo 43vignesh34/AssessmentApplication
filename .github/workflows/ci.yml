@@ -43,3 +43,6 @@ jobs:
           if-no-files-found: error
       - name: Run Unit tests
         run: mvn -B test
+      - name: Run Unit + Integration tests
+        run: mvn -B verify
+
