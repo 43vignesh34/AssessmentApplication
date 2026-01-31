@@ -29,9 +29,6 @@ jobs:
           java -version
           mvn -version
 
-      - name: Run tests
-        run: mvn -B clean test
-
       - name: Package JAR
         run: mvn -B package -DskipTests
 
@@ -41,8 +38,7 @@ jobs:
           name: springboot-jar
           path: target/*.jar
           if-no-files-found: error
-      - name: Run Unit tests
-        run: mvn -B test
+
       - name: Run Unit + Integration tests
-        run: mvn -B verify
+        run: mvn -B clean verify
 
