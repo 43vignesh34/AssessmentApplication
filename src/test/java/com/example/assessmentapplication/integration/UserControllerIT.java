@@ -1,3 +1,5 @@
+package com.example.assessmentapplication.integration;
+
 import org.springframework.test.web.servlet.MockMvc;
 import com.example.assessmentapplication.Repository.UserRepository;
 import com.example.assessmentapplication.entity.User;
