@@ -42,30 +42,29 @@ jobs:
       - name: Run Unit + Integration tests
         run: mvn -B clean verify
 
-deploy:
-    # 1. DEPENDENCY: Only run if 'build-and-test' passed
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    
-    # 2. TRIGGER: Only deploy on push to main (don't deploy PRs!)
-    if: github.ref == 'refs/heads/main'
+  deploy:
+      # 1. DEPENDENCY: Only run if 'build-and-test' passed
+      needs: build-and-test
+      runs-on: ubuntu-latest
+      
+      # 2. TRIGGER: Only deploy on push to main (don't deploy PRs!)
+      if: github.ref == 'refs/heads/main'
 
-    steps:
-      # 3. GET THE JAR: Download what Job 1 built
-      - name: Download JAR
-        uses: actions/download-artifact@v4
-        with:
-          name: springboot-jar  # Must match the 'name' in Job 1
-          
-      # 4. THE DEPLOYMENT: The standard Action to talk to AWS
-      - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: AssessmentApplication
-          environment_name: AssessmentApplication-env         
-          version_label: "ver-${{ github.sha }}"    # Unique ID for this deployment
-          region: ap-southeast-2                         # Replace with your real region
-          deployment_package: target/AssessmentApplication-0.0.2-SNAPSHOT.jar # Verify this path matches your pom.xml version
-          
+      steps:
+        # 3. GET THE JAR: Download what Job 1 built
+        - name: Download JAR
+          uses: actions/download-artifact@v4
+          with:
+            name: springboot-jar  # Must match the 'name' in Job 1
+            
+        # 4. THE DEPLOYMENT: The standard Action to talk to AWS
+        - name: Deploy to EB
+          uses: einaregilsson/beanstalk-deploy@v21
+          with:
+            aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            application_name: AssessmentApplication
+            environment_name: AssessmentApplication-env         
+            version_label: "ver-${{ github.sha }}"    # Unique ID for this deployment
+            region: ap-southeast-2                         # Replace with your real region
+            deployment_package: target/AssessmentApplication-0.0.2-SNAPSHOT.jar # Verify this path matches your pom.xml version
