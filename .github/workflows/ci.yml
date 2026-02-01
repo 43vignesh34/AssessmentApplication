@@ -56,6 +56,15 @@ jobs:
           uses: actions/download-artifact@v4
           with:
             name: springboot-jar  # Must match the 'name' in Job 1
+          - name: Debug Secrets
+        run: |
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+            echo "Access Key is MISSING or EMPTY"
+          else
+            echo "Access Key is FOUND (Length: ${#KEY})"
+          fi
+        env:
+          KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
             
         # 4. THE DEPLOYMENT: The standard Action to talk to AWS
         - name: Deploy to EB
