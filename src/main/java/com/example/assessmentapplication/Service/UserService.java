@@ -6,21 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService
-{
-
+public class UserService {
 
     @Autowired
     private UserRepository repo;
-    public User findByUsername(String username)
-    {
+
+    public User findByUsername(String username) {
         System.out.println(">> username=\"" + username + "\" length=" + username.length());
         User user = repo.findByUsername(username);
-        System.out.println("User:"+user);
+        System.out.println("User:" + user);
         return user;
     }
-    public void registerUser(User user)
-    {
+
+    public void registerUser(User user) {
         repo.save(user);
     }
 

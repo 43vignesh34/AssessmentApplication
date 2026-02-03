@@ -71,7 +71,7 @@ jobs:
       # 4. THE DEPLOYMENT: The standard Action to talk to AWS
       - name: Deploy to EB
         uses: einaregilsson/beanstalk-deploy@v21
-        with:
+        with: # The key and secret key are what tells aws to allow us to deploy to that environment
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: AssessmentApplication

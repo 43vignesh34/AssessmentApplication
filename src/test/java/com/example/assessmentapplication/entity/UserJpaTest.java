@@ -6,26 +6,26 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.ConstraintViolationException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = Replace.ANY) // forces in-memory DB for the test
+@DataJpaTest // Loads only the database layer and not the entire application
+@AutoConfigureTestDatabase(replace = Replace.ANY) // forces replacement of the real database with an in-memory database
+// Ensures that the tests run against an in-memory database without messing with
+// the real database
 class UserJpaTest {
 
-    @PersistenceContext
+    @PersistenceContext // Autowired but for JPA
     private EntityManager entityManager;
 
     @Test
     void showDatabase() {
         entityManager
-            .createNativeQuery("select 1")
-            .getSingleResult();
+                .createNativeQuery("select 1")
+                .getSingleResult();
     }
 
     @Test
@@ -48,7 +48,7 @@ class UserJpaTest {
     @Test
     void username_isRequired() {
         User user = new User();
-        //user.setUsername("vignesh1");
+        // user.setUsername("vignesh1");
         user.setPassword("secret");
 
         assertThrows(ConstraintViolationException.class, () -> {
