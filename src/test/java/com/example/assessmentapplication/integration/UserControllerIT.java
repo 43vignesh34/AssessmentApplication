@@ -17,39 +17,40 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
-@SpringBootTest //Starts the entire SpringBoot App for testing
+@SpringBootTest // Starts the entire SpringBoot App for testing
 @AutoConfigureMockMvc
-class UserControllerIT
-{
-    @Autowired // Injects a fake web server to send HTTP requests to controllers without starting a real server
-    MockMvc mockMvc;
+class UserControllerIT {
+    @Autowired // Injects a fake web server to send HTTP requests to controllers without
+               // starting a real server
+    MockMvc mockMvc; // Testing tool that pretends to be a browser or Postman
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository; // Interface that connects codebase to database
+
     @Test
-    void register_createsUser() throws Exception
-    {
+    void register_createsUser() throws Exception {
         String userJson = """
-            {"username":"vignesh","password":"pass123"}
-            """;
+                {"username":"vignesh","password":"pass123"}
+                """;
         mockMvc.perform(
                 post("/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(userJson)
-        ).andExpect(status().isOk());
+                        .content(userJson))
+                .andExpect(status().isOk());
         User saved = userRepository.findByUsername("vignesh");
         assertNotNull(saved);
-        assertEquals("vignesh",saved.getUsername());
-        
+        assertEquals("vignesh", saved.getUsername());
+
     }
+
     @Test
-    void failureTestCase() throws Exception
-    {
+    void failureTestCase() throws Exception {
         String badJson = """
                 {"username":"",
                   "password":"pass123"}
                 """;
         User wrongUser = userRepository.findByUsername("");
-        mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON).content(badJson)).andExpect(status().isBadRequest());
+        mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON).content(badJson))
+                .andExpect(status().isBadRequest());
         assertNull(wrongUser);
     }
 }

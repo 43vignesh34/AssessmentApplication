@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+@RestControllerAdvice // This class is a global exception handler
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class) // Designated method for each kind of error

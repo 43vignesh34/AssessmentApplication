@@ -15,7 +15,7 @@ public class Subscription {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     // 1. Link to the User (Foreign Key)
     @ManyToOne(fetch = FetchType.LAZY) // Many subscriptions can belong to one user
