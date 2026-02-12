@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 @RestController
-public class Controller {
+public class UserController {
     @Autowired
     private UserService userService;
 
