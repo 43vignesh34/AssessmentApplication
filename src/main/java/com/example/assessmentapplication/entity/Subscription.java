@@ -1,7 +1,9 @@
 package com.example.assessmentapplication.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
@@ -24,9 +26,11 @@ public class Subscription {
 
     // 2. Service Name (e.g., "Netflix", "Spotify")
     @Column(nullable = false)
+    @NotBlank(message = "Service name is required")
     private String serviceName;
 
     // 3. Plan Type (e.g., "Premium 4K", "Student")
+    @NotBlank(message = "Plan type is required")
     private String planType;
 
     // 4. Renewal Date (e.g., 2023-10-25)
@@ -35,8 +39,10 @@ public class Subscription {
 
     // 5. Cost (e.g., 15.99)
     @NotNull
+    @Positive(message = "Value must be positive")
     private BigDecimal amount; // When we do calculations, we use BigDecimal instead of double because double
                                // is not precise
 
+    @Getter
     private String currency = "USD"; // Default to USD
 }

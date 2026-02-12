@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.assessmentapplication.Service.SubscriptionService;
 import com.example.assessmentapplication.entity.Subscription;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/subscriptions") // Changed to /api/subscriptions to match tests
 public class SubscriptionController {
@@ -31,21 +33,22 @@ public class SubscriptionController {
         return new ResponseEntity<>(subscriptions, HttpStatus.OK);
     }
 
-    @PostMapping("/createSubscription/{userId}")
+    @PostMapping("/user/{userId}")
     public ResponseEntity<Subscription> createSubscription(@PathVariable int userId,
-            @RequestBody Subscription subscription) {
+            @Valid @RequestBody Subscription subscription) {
         Subscription createdSubscription = subscriptionService.createSubscription(userId, subscription);
         return new ResponseEntity<>(createdSubscription, HttpStatus.CREATED);
     }
 
-    @GetMapping("/subscription/{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Subscription> getSubscriptionById(@PathVariable int id) {
         Subscription subscription = subscriptionService.getSubscriptionById(id);
         return new ResponseEntity<>(subscription, HttpStatus.OK);
     }
 
-    @PutMapping("/updateSubscription/{id}")
-    public ResponseEntity<Subscription> updateSubscription(@PathVariable int id, @RequestBody Subscription subscription)
+    @PutMapping("/{id}")
+    public ResponseEntity<Subscription> updateSubscription(@PathVariable int id,
+            @Valid @RequestBody Subscription subscription)
     // id is also taken as input to verify if the subscription exists and we're
     // updating the correct subscription
     {
@@ -53,7 +56,7 @@ public class SubscriptionController {
         return new ResponseEntity<>(updatedSubscription, HttpStatus.OK);
     }
 
-    @DeleteMapping("/deleteSubscription/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSubscription(@PathVariable int id) {
         subscriptionService.deleteById(id);
         return new ResponseEntity<>("Subscription deleted successfully", HttpStatus.OK);

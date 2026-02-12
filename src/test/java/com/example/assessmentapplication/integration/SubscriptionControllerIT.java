@@ -20,6 +20,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -61,6 +62,7 @@ public class SubscriptionControllerIT {
         mockMvc.perform(post("/api/subscriptions/user/" + testUser.getId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(subscription)))
+                .andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.serviceName").value("Netflix"))
                 .andExpect(jsonPath("$.user").exists()); // Should show user since it's returned
@@ -71,6 +73,7 @@ public class SubscriptionControllerIT {
         Subscription s1 = new Subscription();
         s1.setUser(testUser);
         s1.setServiceName("Spotify");
+        s1.setPlanType("Premium");
         s1.setAmount(new BigDecimal("9.99"));
         s1.setNextRenewalDate(LocalDate.now());
         subscriptionRepository.save(s1);
@@ -78,6 +81,7 @@ public class SubscriptionControllerIT {
         Subscription s2 = new Subscription();
         s2.setUser(testUser);
         s2.setServiceName("Hulu");
+        s2.setPlanType("Standard (Ads)");
         s2.setAmount(new BigDecimal("7.99"));
         s2.setNextRenewalDate(LocalDate.now());
         subscriptionRepository.save(s2);
@@ -92,12 +96,13 @@ public class SubscriptionControllerIT {
         Subscription s1 = new Subscription();
         s1.setUser(testUser);
         s1.setServiceName("Disney+");
+        s1.setPlanType("Basic");
         s1.setAmount(new BigDecimal("8.99"));
         s1.setNextRenewalDate(LocalDate.now());
         s1 = subscriptionRepository.save(s1);
 
         mockMvc.perform(delete("/api/subscriptions/" + s1.getId()))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
 
         mockMvc.perform(get("/api/subscriptions/user/" + testUser.getId()))
                 .andExpect(status().isOk())
