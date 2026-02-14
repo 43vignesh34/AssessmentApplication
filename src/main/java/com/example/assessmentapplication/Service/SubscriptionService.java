@@ -6,6 +6,7 @@ import com.example.assessmentapplication.entity.Subscription;
 import com.example.assessmentapplication.entity.User;
 import com.example.assessmentapplication.exception.ResourceNotFoundException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,12 @@ public class SubscriptionService {
 
     public List<Subscription> getSubscriptionByUserId(int userid) {
         return subscriptionRepository.findByUserId(userid);
+    }
+
+    public List<Subscription> getUpcomingRenewals(int userId) {
+        LocalDate localDate = LocalDate.now(); // Gets todays date
+        LocalDate endDate = localDate.plusDays(7);
+        return subscriptionRepository.findByUserIdAndNextRenewalDateBetween(userId, localDate, endDate);
     }
 
 }
