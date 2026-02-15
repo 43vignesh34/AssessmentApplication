@@ -90,7 +90,7 @@ public class AnalyticsControllerIT {
         subscription2.setCurrency("INR");
         subscriptionRepository.save(subscription2);
 
-        mockMvc.perform(get("/api/analytics/totalAmountForUser/" + savedUser.getId()))
+        mockMvc.perform(get("/api/analytics/totalAmount/" + savedUser.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", is(30.0)));
     }
