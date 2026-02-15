@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -25,5 +26,5 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Inte
     // COALESCE is a SQL function that returns the first non-null value in the list
     // of arguments
     // :userId is a named parameter
-    BigDecimal calculateAmountForUser(int userid);
+    BigDecimal calculateAmountForUser(@Param("userId") int userid);
 }

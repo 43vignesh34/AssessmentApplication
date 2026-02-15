@@ -80,4 +80,8 @@ public class SubscriptionService {
         return subscriptionRepository.findByUserIdAndNextRenewalDateBetween(userId, localDate, endDate);
     }
 
+    public java.math.BigDecimal calculateTotalAmount(int userId) {
+        return subscriptionRepository.calculateAmountForUser(userId);
+    }
+
 }

@@ -1,7 +1,9 @@
 package com.example.assessmentapplication.Controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import org.hibernate.annotations.TimeZoneStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +22,11 @@ public class AnalyticsController {
     @GetMapping("/upcomingRenewals/{userId}")
     public List<Subscription> getUpcomingRenewals(@PathVariable int userId) {
         return subscriptionService.getUpcomingRenewals(userId);
+    }
+
+    @GetMapping("/totalAmount/{userId}")
+    public java.math.BigDecimal getTotalAmount(@PathVariable int userId) {
+        return subscriptionService.calculateTotalAmount(userId);
     }
 
 }
