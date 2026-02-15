@@ -32,17 +32,15 @@ public class AnalyticsControllerIT {
     SubscriptionRepository subscriptionRepository;
 
     @Test
-    @SuppressWarnings({ "unchecked", "null" }) // Didnt understand this
+    @SuppressWarnings({ "null" }) // Didnt understand this
     public void testGetUpcomingRenewals() throws Exception {
         User user = new User();
-        user.setId(1);
         user.setUsername("John Doe");
         user.setPassword("password");
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         Subscription subscription1 = new Subscription();
-        subscription1.setUser(user);
-        subscription1.setId(1);
+        subscription1.setUser(savedUser);
         subscription1.setNextRenewalDate(LocalDate.now().plusDays(1));
         subscription1.setServiceName("Netflix");
         subscription1.setPlanType("Premium");
@@ -51,8 +49,7 @@ public class AnalyticsControllerIT {
         subscriptionRepository.save(subscription1);
 
         Subscription subscription2 = new Subscription();
-        subscription2.setUser(user);
-        subscription2.setId(2);
+        subscription2.setUser(savedUser);
         subscription2.setNextRenewalDate(LocalDate.now().plusDays(20));
         subscription2.setServiceName("Prime Video");
         subscription2.setPlanType("Premium");
@@ -60,7 +57,7 @@ public class AnalyticsControllerIT {
         subscription2.setCurrency("INR");
         subscriptionRepository.save(subscription2);
 
-        mockMvc.perform(get("/api/analytics/upcomingRenewals/1"))
+        mockMvc.perform(get("/api/analytics/upcomingRenewals/" + savedUser.getId()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(1))).andExpect(jsonPath("$[0].serviceName", is("Netflix")));
 
