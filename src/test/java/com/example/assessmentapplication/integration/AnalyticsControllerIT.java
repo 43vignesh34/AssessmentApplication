@@ -63,4 +63,36 @@ public class AnalyticsControllerIT {
 
     }
 
+    @SuppressWarnings("null") // Why do we need this?
+    @Test
+    public void testGetTotalAmountForUser() throws Exception // Why do we need this?
+    {
+        User user = new User();
+        user.setUsername("John Doe");
+        user.setPassword("password");
+        User savedUser = userRepository.save(user);
+
+        Subscription subscription1 = new Subscription();
+        subscription1.setUser(savedUser);
+        subscription1.setNextRenewalDate(LocalDate.now().plusDays(1));
+        subscription1.setServiceName("Netflix");
+        subscription1.setPlanType("Premium");
+        subscription1.setAmount(new BigDecimal(10.0));
+        subscription1.setCurrency("INR");
+        subscriptionRepository.save(subscription1);
+
+        Subscription subscription2 = new Subscription();
+        subscription2.setUser(savedUser);
+        subscription2.setNextRenewalDate(LocalDate.now().plusDays(20));
+        subscription2.setServiceName("Prime Video");
+        subscription2.setPlanType("Premium");
+        subscription2.setAmount(new BigDecimal(20.0));
+        subscription2.setCurrency("INR");
+        subscriptionRepository.save(subscription2);
+
+        mockMvc.perform(get("/api/analytics/totalAmountForUser/" + savedUser.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(30.0)));
+    }
+
 }
