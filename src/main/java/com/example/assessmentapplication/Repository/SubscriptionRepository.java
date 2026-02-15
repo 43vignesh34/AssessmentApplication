@@ -1,9 +1,11 @@
 package com.example.assessmentapplication.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.example.assessmentapplication.entity.Subscription;
 
@@ -18,4 +20,10 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Inte
                                                  // automatically generate the query
 
     List<Subscription> findByUserIdAndNextRenewalDateBetween(int userid, LocalDate startDate, LocalDate endDate);
+
+    @Query("SELECT COALESCE(SUM(s.amount),0) FROM Subscription s WHERE s.user.id = :userId")
+    // COALESCE is a SQL function that returns the first non-null value in the list
+    // of arguments
+    // :userId is a named parameter
+    BigDecimal calculateAmountForUser(int userid);
 }
