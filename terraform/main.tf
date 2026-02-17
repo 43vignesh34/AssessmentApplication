@@ -1,3 +1,5 @@
+//Manual creation of resources in AWS console everytime we login is a nightmare
+
 provider "aws" 
 {
     region = "ap-south-1"
@@ -58,10 +60,13 @@ resource "aws_instance" "app_server" //The Server itself
     //This runs ONCE when the server starts. It installs Java for us.
     //Without this, we would have an empty Ubuntu server and would have to 
     //manually run these commands.
-  user_data = <<-EOF //This is a heredoc. It allows us to write multi-line strings(Until you see EOF)
-              #!/bin/bash //This is a shebang. It tells the server to run this as a bash script
-              sudo apt-get update //Update the package list
-              sudo apt-get install -y openjdk-17-jdk //Install Java
+  user_data = <<-EOF # This is a heredoc. It allows us to write multi-line strings
+              #!/bin/bash
+              # This is a shebang. It tells the server to run this as a bash script
+              sudo apt-get update 
+              # Update the package list
+              sudo apt-get install -y openjdk-17-jdk 
+              # Install Java
               EOF
 }
 
