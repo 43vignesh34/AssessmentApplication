@@ -32,4 +32,19 @@ jobs:
              #Handles downloading dependencies and building the JAR(Java Archive which is the executable
              #zip file of the entire application)
               run: mvn -B package -DskipTests 
-              #Builds this JAR file and places it in target folder 
+              #Builds this JAR file and places it in target folder
+              #We skipped tests because 1.Its a waste running tests if code is broken 2.We can make error identification 
+              #easier by separating it from tests
+            - name: run Unit + Integration tests
+              run: mvn -B clean verify
+              #-B: Runs maven in non-interactive mode
+              #clean: Cleans the target folder which may contain old files
+              #verify: Runs both unit and integration tests, after the build. 'test' would only run unit tests
+            - name: Upload JAR artifact
+              #We need this as after build finishes container is destroyed and JAR vanishes.
+              #We need to hence download and save it for deployment
+              uses: actions/upload-artifact@v4
+              with:
+                name: springboot-jar
+                path: target/*.jar
+                if-no-files-found: error
