@@ -3,9 +3,9 @@ name: CI for App
 #Trigger to call pipeline whenever requests are sent to the branch, so that broken code will not be merged
 on:
     push:
-        branches: ["main", "master"]
+        branches: ["main", "tryVignesh"]
     pull_request:
-        branches: ["main", "master"]
+        branches: ["main", "tryVignesh"]
 
 #Eliminates the "It runs on my machine problem" by using a fresh Ubuntu container for every build.
 #Container is deleted when tests pass/fail
