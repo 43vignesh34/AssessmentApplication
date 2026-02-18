@@ -1,0 +1,18 @@
+If Im on a random branch, and I want to switch to main branch
+
+1. git checkout main 
+   # ACTION: Switches your local workspace to the 'main' branch.
+   # WHAT IS 'LOCAL WORKSPACE'? The actual folder on your laptop where you are writing code.
+   # WHY: You must be ON the branch you want to update.
+   # NOTE: If you have unsaved changes, Git might stop you. Commit or stash them first.
+
+2. git pull origin main
+   # ACTION: Downloads the latest code from GitHub (origin) and merges it into your local 'main'.
+   # WHY: Your teammate might have pushed new code. You need to sync up before you start working.
+   # BREAKDOWN: 'pull' = 'fetch' (download) + 'merge' (combine). 
+
+3. Q: Can't I just run `git pull origin main` directly?
+   # A: YES, but be careful.
+   # IF you are on 'feature-branch' and run `git pull origin main`, 
+   # it will merge 'main' INTO 'feature-branch'.
+   # IF you wanted to update your local 'main', you MUST checkout 'main' first. 
