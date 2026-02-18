@@ -1,0 +1,35 @@
+name: CI for App
+
+#Trigger to call pipeline whenever requests are sent to the branch, so that broken code will not be merged
+on:
+    push:
+        branches: ["main", "master"]
+    pull_request:
+        branches: ["main", "master"]
+
+#Eliminates the "It runs on my machine problem" by using a fresh Ubuntu container for every build.
+#Container is deleted when tests pass/fail
+
+jobs:
+    build:
+#Build means compiling testing and packaging
+        runs-on: ubuntu-latest
+    
+        steps:
+            - name: Checkout #Means cloning repository from GitHub into your container 
+            #These are GitHub scripts using which container talks to Git
+              uses: actions/checkout@v4
+            
+            #Now that we have the code. We need to install Java
+            - name: Setup Java 17
+              uses: actions/setup-java@v4
+            #This particular action has arguments which are passed under with
+              with: 
+                distribution: "temurin" #The type of Java
+                java-version: "17" #The version of Java
+
+            - name: Build Application
+             #Handles downloading dependencies and building the JAR(Java Archive which is the executable
+             #zip file of the entire application)
+              run: mvn -B package -DskipTests 
+              #Builds this JAR file and places it in target folder 
