@@ -38,6 +38,7 @@ jobs:
           name: springboot-jar
           path: target/*.jar
           if-no-files-found: error
+          retention-days: 1
 
       - name: Run Unit + Integration tests
         run: mvn -B clean verify
