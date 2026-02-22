@@ -18,7 +18,8 @@ public class UserService {
         return user;
     }
 
-    public void registerUser(User user) {
+    public void registerUser(User user) 
+    {
         repo.save(user);
     }
 
