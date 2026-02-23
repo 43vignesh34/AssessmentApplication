@@ -95,3 +95,23 @@ If we didn't use `--from=build`, Docker would try to find a `.jar` file on your 
 **2. `ENTRYPOINT ["java", "-jar", "app.jar"]`**
 *   **What it means:** This is the terminal command that executes the moment the container turns on.
 *   **Why it's needed:** Without an Entrypoint or a Cmd, a container starts, realizes it has nothing to do, and immediately turns itself off. This line tells the Java Runtime Environment to execute our `.jar` application and keep the process alive.
+
+## Interview Questions
+
+**Q1: Walk me through how you Dockerized your Spring Boot application. Did you optimize the build process?**
+> **How to Answer:** Don't just list the commands. Talk about your *strategy*. "Yes, I used a multi-stage build. In the first stage, I focused on **layer caching**. I specifically copied only the `pom.xml` first and ran `mvn dependency:go-offline`. This forces Docker to cache all the heavy internet downloads. I copy the actual source code *after* this step. In the second stage, I used a lightweight JRE image to actually run the application."
+
+**Q2: What is a Multi-Stage Docker Build, and why did you use it instead of just running `mvn clean package` in a single container?**
+> **How to Answer:** "A multi-stage build separates the build environment from the runtime environment. A Maven image with a full JDK is huge (often 600MB+) and isn't secure for production because it contains my raw source code and compilers. By using a second `FROM` command with just a `jre` (Java Runtime Environment), the final image is much smaller, deploys much faster, and is highly secure."
+
+**Q3: In your Dockerfile, I see you used the base image `maven:3.9.6-eclipse-temurin-17`. Why didn't you just use `FROM maven:latest`?**
+> **How to Answer:** "Using the `latest` tag is a bad practice for production because it leads to non-deterministic builds. If the Maven team pushes a breaking update tomorrow, `latest` automatically pulls it, and my CI/CD pipeline could suddenly fail even if I didn't change my code. Pinning specific versions guarantees stability and documents exactly what infrastructure the app requires."
+
+**Q4: Let's say a developer fixes a single typo in a Java controller. Step-by-step, how does Docker handle rebuilding your image?**
+> **How to Answer:** "Docker checks its layer cache top-to-bottom. It will see that the `pom.xml` hasn't changed, so it will instantly use the cached snapshot for downloading dependencies, skipping a 5-minute download. The cache will only 'break' when it hits the `COPY src ./src` command. From that point on, it will recompile the code and create the final JAR."
+
+**Q5: What is the practical difference between a JDK and a JRE in the context of Docker containers?**
+> **How to Answer:** "The JDK (Java Development Kit) contains the tools to compile code, like `javac`, and Maven needs it to build the project. The JRE (Java Runtime Environment) only contains the engine to execute already-compiled code (`java -jar`). My build stage uses the JDK, but my final production container exclusively uses the JRE to save space."
+
+**Q6: Why is it considered bad practice to run `mvn clean package` on your local Macbook and just write a simple Dockerfile that says `COPY target/app.jar .`?**
+> **How to Answer:** "That violates the core goal of Docker, which is eliminating the *'it works on my machine'* problem. If I build the `.jar` locally, I might be using Java 21 while the server uses Java 17, or I might have custom environment variables. By putting the Maven build process *inside* the Docker container (Stage 1), I guarantee that the application is built in the exact same pristine, reproducible environment every single time, whether it's on my laptop or on a GitHub Actions runner."
