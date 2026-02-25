@@ -76,7 +76,6 @@ jobs:
             echo "Access Key is FOUND (Length: ${#KEY})"
           fi
         
-        environment_name: AssessmentApplication-docker-env. 
         env:
           KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
           
