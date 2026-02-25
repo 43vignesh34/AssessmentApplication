@@ -32,8 +32,23 @@ jobs:
       - name: Package JAR
         run: mvn -B package -DskipTests
 
-      - name: Build Docker Image
-        run: docker build -t springboot-app:latest .
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t 43vignesh34/springboot-app:latest .
+          docker push 43vignesh34/springboot-app:latest
+
+      - name: Upload Dockerrun for EB
+        uses: actions/upload-artifact@v4
+        with:
+          name: eb-dockerrun
+          path: Dockerrun.aws.json
+          retention-days: 1
 
 
       - name: Run Unit + Integration tests
@@ -48,12 +63,10 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      # 3. GET THE JAR: Download what Job 1 built
-      - name: Download JAR
+      - name: Download Dockerrun
         uses: actions/download-artifact@v4
         with:
-          name: springboot-jar  # Must match the 'name' in Job 1
-          path: target
+          name: eb-dockerrun
 
       - name: Debug Secrets
         run: |
@@ -75,4 +88,4 @@ jobs:
           environment_name: AssessmentApplication-env         
           version_label: "ver-${{ github.sha }}"    # Unique ID for this deployment
           region: ap-southeast-2                         # Replace with your real region
-          deployment_package: target/AssessmentApplication-0.0.2-SNAPSHOT.jar # Verify this path matches your pom.xml version
+          deployment_package: Dockerrun.aws.json
