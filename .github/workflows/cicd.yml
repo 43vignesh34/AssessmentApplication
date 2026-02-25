@@ -75,6 +75,8 @@ jobs:
           else
             echo "Access Key is FOUND (Length: ${#KEY})"
           fi
+        
+        environment_name: AssessmentApplication-docker-env. 
         env:
           KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
           
@@ -85,7 +87,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: AssessmentApplication
-          environment_name: AssessmentApplication-env         
+          environment_name: AssessmentApplication-docker-env         
           version_label: "ver-${{ github.sha }}"    # Unique ID for this deployment
           region: ap-southeast-2                         # Replace with your real region
           deployment_package: Dockerrun.aws.json
