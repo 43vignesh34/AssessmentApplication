@@ -32,13 +32,9 @@ jobs:
       - name: Package JAR
         run: mvn -B package -DskipTests
 
-      - name: Upload JAR artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: springboot-jar
-          path: target/*.jar
-          if-no-files-found: error
-          retention-days: 1
+      - name: Build Docker Image
+        run: docker build -t springboot-app:latest .
+
 
       - name: Run Unit + Integration tests
         run: mvn -B clean verify

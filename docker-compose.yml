@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   #Fancy word for a container. If app has Spring Boot Backend and MySQL
@@ -7,7 +6,8 @@ services:
     #When we start this file SpringBoot starts much faster than MySQL.
     #So SpringBoot tries to connect to MySQL and crash because MySQL is not ready yet.
     #So we use depends_on to make SpringBoot wait for MySQL until MySQL is ready.
-    depends_on: -mysqldb
+    depends_on:
+      - mysqldb
     #Name we are giving to SpringBoot service. We can name it anything.
     #But it is good practice to name it something meaningful.
     build: .
@@ -31,9 +31,11 @@ services:
     #We dont use build because we are not building a custom image for MySQL. 
     #Instead, we are using the official MySQL image from Docker Hub.
     image: mysql:8.0
-    ports: "3306:3306"
+    ports:
+      - "3306:3306"
     environment:
       #MYSQL_DATABASE tells Docker: "When you start up for the very first time, 
       #create an empty database with this name." 
       #(Notice it matches the userdb name we told Spring Boot to look for!)
-      -MYSQL_DATABASE = userdb -MYSQL_ROOT_PASSWORD=V1gnesh@123 #Matches the root user password we put in Spring Boot's application.properties
+      - MYSQL_DATABASE=userdb
+      - MYSQL_ROOT_PASSWORD=V1gnesh@123 #Matches the root user password we put in Spring Boot's application.properties
