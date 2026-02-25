@@ -43,12 +43,7 @@ jobs:
           docker build -t 43vignesh34/springboot-app:latest .
           docker push 43vignesh34/springboot-app:latest
 
-      - name: Upload Dockerrun for EB
-        uses: actions/upload-artifact@v4
-        with:
-          name: eb-dockerrun
-          path: Dockerrun.aws.json
-          retention-days: 1
+
 
 
       - name: Run Unit + Integration tests
@@ -63,10 +58,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     steps:
-      - name: Download Dockerrun
-        uses: actions/download-artifact@v4
-        with:
-          name: eb-dockerrun
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Debug Secrets
         run: |
