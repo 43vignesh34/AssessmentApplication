@@ -39,3 +39,5 @@ Based on the pipeline you just built, here are the most likely interview questio
 > *   **Yes:** You need to know the **structure** and **modules** (Triggers -> Jobs -> Steps -> Actions).
 > *   **Strategy:** "I start with a template or documentation, but I customize the logic. I know I need a Checkout step, a Setup Java step, and a Build step. The exact syntax like `uses: actions/checkout@v4` I verify from the marketplace."
 
+---
+

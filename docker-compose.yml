@@ -1,4 +1,3 @@
-
 services:
   #Fancy word for a container. If app has Spring Boot Backend and MySQL
   # DB, we would have 2 services here.
@@ -7,7 +6,12 @@ services:
     #So SpringBoot tries to connect to MySQL and crash because MySQL is not ready yet.
     #So we use depends_on to make SpringBoot wait for MySQL until MySQL is ready.
     depends_on:
-      - mysqldb
+      # We tell Docker to wait not just until the MySQL container is "running",
+      # but until its internal healthcheck explicitly says "I am healthy and ready!"
+      # This is important because MySQL can take a few seconds to start up and initialize.
+      # If we don't wait for the healthcheck, Spring Boot might try to connect too early and fail.
+      mysqldb:
+        condition: service_healthy
     #Name we are giving to SpringBoot service. We can name it anything.
     #But it is good practice to name it something meaningful.
     build: .
@@ -20,12 +24,27 @@ services:
       #we explicitly poke a hole for it
       - "8080:8080"
     environment:
-      #Because localhost:3306 inside the container means the container itself, not your Mac, and there is no MySQL running inside the Spring Boot container!
-      #Instead of changing your Java code, Docker allows us to inject Environment Variables that override 
-      #application.properties when the container starts.
+      # NETWORKING MAGIC:
+      # Notice the URL is `jdbc:mysql://mysqldb:3306/userdb`. 
+      # How does Java know what IP "mysqldb" is? Docker Compose places both containers on a private internal network.
+      # Docker runs an internal DNS Server that automatically translates the service name "mysqldb" into the container's IP address!
+      # We override properties using environment variables so we don't need to rebuild the Java code for different environments.
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/userdb
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=V1gnesh@123
+
+    # RESOURCE LIMITS: Protecting the Host Machine
+    # Without these, a memory leak here could consume 100% of your Mac's RAM, causing an OOM (Out Of Memory) crash
+    # for the entire system. Without CPU limits, a heavy operation could starve the database (Noisy Neighbor problem).
+    deploy:
+      resources:
+        limits:
+          # Hard limit: The container will crash/throttle if it tries to use more than this
+          cpus: '0.5'
+          memory: 512M
+      reservations:
+        cpus: '0.2'
+        memory: 256M
 
   mysqldb:
     #We dont use build because we are not building a custom image for MySQL. 
@@ -39,3 +58,32 @@ services:
       #(Notice it matches the userdb name we told Spring Boot to look for!)
       - MYSQL_DATABASE=userdb
       - MYSQL_ROOT_PASSWORD=V1gnesh@123 #Matches the root user password we put in Spring Boot's application.properties
+
+    # VOLUME MAPPING: (SOURCE : DESTINATION)
+    # 1. Left side (db_data): The safe, permanent folder living outside the container on the host machine.
+    #    (If we used an absolute path here instead, like `/Users/vignesh/my_db_folder`, it would map to that EXACT folder on your Mac instead of letting Docker manage it automatically).
+    # 2. Right side (/var/lib/mysql): The default folder inside the container where MySQL saves all its data.
+    # Result: Docker secretly intercepts database writes to /var/lib/mysql and saves them to the permanent db_data volume.
+    volumes:
+      - db_data:/var/lib/mysql
+    # HEALTHCHECK: The Chef & Waiter Analogy
+    # We tell Docker to continuously "ping" this container to see if MySQL is actually ready.
+    # If we didn't do this, Spring Boot (The Waiter) would rush in the second MySQL (The Chef) started,
+    # before MySQL even had time to turn on the stove, causing Spring Boot to crash!
+    healthcheck:
+      # The command Docker runs inside the container to check if it's alive.
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pV1gnesh@123" ]
+      # How long to wait before running the check for the first time (give MySQL time to boot up)
+      start_period: 10s
+      # How often to run the check
+      interval: 10s
+      # If the ping takes longer than 5 seconds to reply, consider it a failure
+      timeout: 5s
+      # Allow 5 consecutive failures before officially marking the container as "unhealthy"
+      retries: 5
+
+# Declare the volume so Docker knows to manage it automatically.
+# This ensures that even if you run `docker-compose down` and destroy the containers,
+# your database data survives in this isolated volume.
+volumes:
+  db_data:
