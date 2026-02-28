@@ -24,9 +24,13 @@ RUN mvn dependency:go-offline
 #COPY source destination
 COPY src ./src
 
-#Compiling the application into a .jar file
-# We use -DskipTests because tests should be run in the CI/CD pipeline before building the Docker image.
-RUN mvn clean package -DskipTests
+# Compiling the application into a .jar file
+# We use BuildKit Cache Mounts (--mount=type=cache) specifically aimed at Maven's local repository (/root/.m2).
+# Even if our code or pom.xml changes heavily (breaking the standard Docker layer cache), 
+# Maven will still find its previously downloaded .jar dependencies safely sitting in this persistent cache,
+# ensuring lightning-fast build times.
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn clean package -DskipTests
 
 # =========================================================
 # STAGE 2: The Runner (Production Environment)
