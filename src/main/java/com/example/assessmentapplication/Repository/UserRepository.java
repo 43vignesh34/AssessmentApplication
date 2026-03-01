@@ -1,11 +1,12 @@
 package com.example.assessmentapplication.Repository;
 
 import com.example.assessmentapplication.entity.User;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
-    User findByUsername(String username);
+    Optional<User> findByUsername(String username);
     // We need to declare this as username is not a primary key
 
 }

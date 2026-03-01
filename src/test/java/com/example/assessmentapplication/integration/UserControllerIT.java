@@ -20,37 +20,37 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 @SpringBootTest // Starts the entire SpringBoot App for testing
 @AutoConfigureMockMvc
 class UserControllerIT {
-    @Autowired // Injects a fake web server to send HTTP requests to controllers without
-               // starting a real server
-    MockMvc mockMvc; // Testing tool that pretends to be a browser or Postman
-    @Autowired
-    private UserRepository userRepository; // Interface that connects codebase to database
+        @Autowired // Injects a fake web server to send HTTP requests to controllers without
+                   // starting a real server
+        MockMvc mockMvc; // Testing tool that pretends to be a browser or Postman
+        @Autowired
+        private UserRepository userRepository; // Interface that connects codebase to database
 
-    @Test
-    void register_createsUser() throws Exception {
-        String userJson = """
-                {"username":"vignesh","password":"pass123"}
-                """;
-        mockMvc.perform(
-                post("/register")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userJson))
-                .andExpect(status().isOk());
-        User saved = userRepository.findByUsername("vignesh");
-        assertNotNull(saved);
-        assertEquals("vignesh", saved.getUsername());
+        @Test
+        void register_createsUser() throws Exception {
+                String userJson = """
+                                {"username":"vignesh","password":"pass123"}
+                                """;
+                mockMvc.perform(
+                                post("/register")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(userJson))
+                                .andExpect(status().isOk());
+                User saved = userRepository.findByUsername("vignesh").orElse(null);
+                assertNotNull(saved);
+                assertEquals("vignesh", saved.getUsername());
 
-    }
+        }
 
-    @Test
-    void failureTestCase() throws Exception {
-        String badJson = """
-                {"username":"",
-                  "password":"pass123"}
-                """;
-        User wrongUser = userRepository.findByUsername("");
-        mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON).content(badJson))
-                .andExpect(status().isBadRequest());
-        assertNull(wrongUser);
-    }
+        @Test
+        void failureTestCase() throws Exception {
+                String badJson = """
+                                {"username":"",
+                                  "password":"pass123"}
+                                """;
+                User wrongUser = userRepository.findByUsername("").orElse(null);
+                mockMvc.perform(post("/register").contentType(MediaType.APPLICATION_JSON).content(badJson))
+                                .andExpect(status().isBadRequest());
+                assertNull(wrongUser);
+        }
 }

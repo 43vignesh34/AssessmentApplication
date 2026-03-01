@@ -13,7 +13,7 @@ public class UserService {
 
     public User findByUsername(String username) {
         System.out.println(">> username=\"" + username + "\" length=" + username.length());
-        User user = repo.findByUsername(username);
+        User user = repo.findByUsername(username).orElse(null);
         System.out.println("User:" + user);
         return user;
     }
