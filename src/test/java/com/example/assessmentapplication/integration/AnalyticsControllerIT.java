@@ -19,7 +19,7 @@ import com.example.assessmentapplication.entity.Subscription;
 import com.example.assessmentapplication.entity.User;
 
 @SpringBootTest // "Hey Spring, start up the whole application for this test!"
-@AutoConfigureMockMvc // "Also, please set up a fake browser (MockMvc) for us to use."
+@AutoConfigureMockMvc(addFilters = false) // "Also, please set up a fake browser (MockMvc) for us to use."
 public class AnalyticsControllerIT {
 
     @Autowired

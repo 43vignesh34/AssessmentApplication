@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 
 @SpringBootTest // Starts the entire SpringBoot App for testing
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerIT {
         @Autowired // Injects a fake web server to send HTTP requests to controllers without
                    // starting a real server

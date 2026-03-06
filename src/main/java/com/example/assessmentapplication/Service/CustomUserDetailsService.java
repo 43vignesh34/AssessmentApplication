@@ -1,3 +1,4 @@
+package com.example.assessmentapplication.Service;
 
 //It implements the Spring Security interface UserDetailsService
 
