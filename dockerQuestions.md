@@ -115,3 +115,9 @@ If we didn't use `--from=build`, Docker would try to find a `.jar` file on your 
 
 **Q6: Why is it considered bad practice to run `mvn clean package` on your local Macbook and just write a simple Dockerfile that says `COPY target/app.jar .`?**
 > **How to Answer:** "That violates the core goal of Docker, which is eliminating the *'it works on my machine'* problem. If I build the `.jar` locally, I might be using Java 21 while the server uses Java 17, or I might have custom environment variables. By putting the Maven build process *inside* the Docker container (Stage 1), I guarantee that the application is built in the exact same pristine, reproducible environment every single time, whether it's on my laptop or on a GitHub Actions runner."
+
+**Q7: What is the difference between the "Exec Form" and the "Shell Form" when writing an ENTRYPOINT command in Docker?**
+> **How to Answer:** "The Exec form uses a JSON array like `ENTRYPOINT ["java", "-jar", "app.jar"]`. This makes the Java application Process ID 1 (PID 1). When the container needs to stop, the JVM receives the `SIGTERM` signal directly and shuts down gracefully. The Shell form is just a string, like `ENTRYPOINT java -jar app.jar`. This makes `/bin/sh` PID 1. The shell blocks stop signals from reaching Java, causing the container to hang for 10 seconds before forcefully killing the application, breaking database connections."
+
+**Q8: When Docker hits the second `FROM` command in your Dockerfile, what exactly happens under the hood?**
+> **How to Answer:** "It throws away the entire filesystem of the first build stage. The Maven compiler, the downloaded dependencies, and the raw source code are completely discarded. Docker starts a brand new, microscopic container from scratch, based solely on the JRE image. Using `COPY --from=build` allows us to securely reach back into the previous stage and pull *only* the compiled executable into this clean environment."
