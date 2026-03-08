@@ -8,9 +8,9 @@ When you run a Maven command, it progresses through a strict sequence of phases.
 The main sequence (in order):
 1.  **`validate`**: Checks if the project is correct and all necessary information is available.
 2.  **`compile`**: Compiles the source code (`.java` -> `.class`).
-3.  **`test`**: Runs the unit tests using a suitable testing framework (like JUnit).
+3.  **`test`**: Runs the unit tests using a suitable testing framework (like JUnit) via the Surefire plugin.
 4.  **`package`**: Takes the compiled code and packages it into its distributable format (like a `.jar` or `.war`).
-5.  **`verify`**: Runs integration tests to ensure quality criteria are met.
+5.  **`verify`**: Runs heavy integration tests (like those interacting with a database) via the Failsafe plugin, ensuring quality criteria are met and temporary resources are safely cleaned up even if tests fail.
 6.  **`install`**: Installs the package into your *local* repository (your Macbook's `~/.m2` folder) for use as a dependency in other projects locally.
 7.  **`deploy`**: Copies the final package to a *remote* repository (like Nexus or Artifactory) for sharing with other developers and projects.
 
@@ -25,12 +25,16 @@ The main sequence (in order):
 *   **Why use it:** A quick check to see if your code has compilation errors without running tests or building the heavy `.jar` file.
 
 ### `mvn test`
-*   **What it does:** Compiles your code AND runs your unit/integration tests located in `src/test/java`.
-*   **Why use it:** To verify your tests pass before pushing code to GitHub.
+*   **What it does:** Compiles your code AND runs your **fast Unit Tests** located in `src/test/java` (files ending in `*Test.java`).
+*   **Why use it:** To get a quick sanity check that your core business logic passes before packaging the application.
 
 ### `mvn package`
-*   **What it does:** Compiles, tests, and bundles the application into its final `.jar` (or `.war`) artifact inside the `target/` directory.
-*   **Why use it:** You want the actual executable file that you will run on a server or place inside a Docker container.
+*   **What it does:** Compiles, tests (unit only), and bundles the application into its final `.jar` (or `.war`) artifact inside the `target/` directory.
+*   **Why use it:** You want the actual executable file that you will run on a server or place inside a Docker container, but you are not running full integration tests yet.
+
+### `mvn verify`
+*   **What it does:** Runs unit tests, packages the `.jar`, AND runs the **heavy Integration Tests** located in `src/test/java` (files ending in `*IT.java`).
+*   **Why use it:** This is the safest way to test database integrations. Because it uses the Failsafe plugin, it guarantees that temporary test databases will be cleanly shut down even if an integration test crashes, preventing memory leaks on the CI/CD server.
 
 ### `mvn install`
 *   **What it does:** Does everything `package` does, PLUS it copies that `.jar` into your hidden `~/.m2/repository` folder on your laptop.
