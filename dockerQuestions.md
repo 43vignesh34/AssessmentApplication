@@ -121,3 +121,74 @@ If we didn't use `--from=build`, Docker would try to find a `.jar` file on your 
 
 **Q8: When Docker hits the second `FROM` command in your Dockerfile, what exactly happens under the hood?**
 > **How to Answer:** "It throws away the entire filesystem of the first build stage. The Maven compiler, the downloaded dependencies, and the raw source code are completely discarded. Docker starts a brand new, microscopic container from scratch, based solely on the JRE image. Using `COPY --from=build` allows us to securely reach back into the previous stage and pull *only* the compiled executable into this clean environment."
+# Docker Cheat Sheet
+
+## ENTRYPOINT vs CMD
+
+### 1. Defining the Container's Main Process
+When you use `ENTRYPOINT`, you are telling Docker, "Whenever a container starts from this image, this is the command that must execute first and stay running." The container's lifecycle is tied to this process. If the `ENTRYPOINT` process exits, the container stops.
+
+Example `Dockerfile`:
+```dockerfile
+ENTRYPOINT ["java", "-jar", "target/AssessmentApplication-0.0.2-SNAPSHOT.jar"]
+```
+This tells Docker that the primary purpose of this container is to run a Java application. The main process that runs inside the container is `java`.
+
+### 2. Interaction with `CMD`
+The `ENTRYPOINT` instruction is closely related to the `CMD` instruction. 
+*   **`ENTRYPOINT`** configures the command that will always be executed.
+*   **`CMD`** sets default arguments that get appended to the `ENTRYPOINT`.
+
+If a Dockerfile has both:
+```dockerfile
+ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["--spring.profiles.active=dev"]
+```
+When you run `docker run myimage`, Docker will execute:
+`java -jar app.jar --spring.profiles.active=dev`
+
+### 3. How `docker run` interacts with it
+When you run a container using `docker run <image_name>`, Docker looks at the image's metadata for the `ENTRYPOINT`.
+
+If you provide additional arguments at the end of your `docker run` command, those arguments evaluate differently based on whether you used `ENTRYPOINT` or `CMD` in your Dockerfile:
+
+*   **If you used `ENTRYPOINT`:** The arguments you pass to `docker run` are **appended** to the `ENTRYPOINT`.
+    ```bash
+    docker run firstimage --server.port=9090
+    ```
+    This translates directly to running: 
+    `java -jar target/AssessmentApplication-0.0.2-SNAPSHOT.jar --server.port=9090` inside the container. This makes it very easy to pass arguments to your Java application.
+
+*   **If you used `CMD` instead of `ENTRYPOINT`:** The arguments you pass to `docker run` completely **override** the `CMD`.
+    If you had `CMD ["java", "-jar", "app.jar"]` and ran `docker run myimage bash`, it would ignore the Java application completely and just run `bash`.
+
+### 4. Exec vs Shell Form
+The **exec form** (JSON array syntax) is highly recommended:
+```dockerfile
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+The **shell form** places a shell in front of your command:
+```dockerfile
+ENTRYPOINT java -jar app.jar
+```
+This turns it into `/bin/sh -c 'java -jar app.jar'`. 
+*   **Why exec form is better:** When you use the shell form, the application doesn't receive Unix signals (like `SIGTERM` when you run `docker stop`). The shell intercepts them. By using the exec form, your application becomes PID 1 inside the container and can gracefully shut down when it receives a stop signal from Docker.
+
+## Managing Containers and Images
+
+### Viewing Images
+- **`docker images`** or **`docker image ls`**: Lists all top-level images, their repository and tags, and their size.
+
+### Viewing Containers
+- **`docker ps`** or **`docker container ls`**: Shows only the currently **running** containers.
+- **`docker ps -a`** (or `--all`) or **`docker container ls -a`**: Shows **all** containers, whether they are running, stopped, or exited. This is usually what you want when trying to find a container that failed or stopped.
+
+### Removing Containers
+You must remove containers that depend on an image before you can remove the image itself.
+- **`docker rm <container_id>`**: Removes a stopped container.
+- **`docker rm -f <container_id>`**: Forcefully removes a running container.
+
+### Removing Images
+- **`docker rmi <image_name>`**: Removes an image.
+- **`docker rmi -f <image_name>`**: Forcefully removes an image. If a container is dependent on it, the container will remain on your system but untagged from the image name.

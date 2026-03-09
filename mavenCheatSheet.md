@@ -70,3 +70,22 @@ The main sequence (in order):
 If you see `./mvnw clean package` instead of `mvn clean package`, it means the project is using the Maven Wrapper.
 *   **The Problem:** You have Maven 3.1 installed on your Macbook. The project requires Maven 3.9. Your build fails.
 *   **The Wrapper Solution:** The repository contains a script (`mvnw`) and a tiny `.mvn` folder. When you run `./mvnw package`, the script downloads the exact version of Maven the project expects, installs it into a hidden folder, and runs the build with it. It guarantees perfectly consistent builds across every developer's machine without forcing them to manually install specific Maven versions globally on their OS.
+
+## 6. Core Concepts: `.class` vs `.jar`
+
+Understanding the difference between these two file types is fundamental to Java and Maven.
+
+### `.class` (Compiled Java Bytecode)
+*   **What it is:** When you run `mvn compile`, the Java compiler (`javac`) reads your human-readable `.java` source code files and translates them, one-by-one, into `.class` files.
+*   **What's inside:** It contains Java bytecode. This is intermediate code that is not meant for a human to read, nor is it meant for your computer's native processor (CPU) to execute directly. 
+*   **How it runs:** A `.class` file can *only* be executed by a Java Virtual Machine (JVM). The JVM translates this bytecode into the machine language your specific operating system (Mac, Windows, Linux) understands.
+*   **Analogy:** A single translated page of a book.
+
+### `.jar` (Java ARchive)
+*   **What it is:** When you run `mvn package`, Maven takes all of your hundreds of compiled `.class` files, all of your application's resources (like `application.properties`, images, HTML templates), and bundles them together into a single, compressed file using the ZIP format. This single file gets the `.jar` extension.
+*   **What's inside:** It is literally just a ZIP file. If you run `unzip myapp.jar`, you will see all of your `.class` files organized into folders matching your package names (e.g., `com/example/app/Main.class`).
+*   **How it runs:** You can run it directly with the `java -jar myapp.jar` command.
+*   **Analogy:** The entire, bound book containing all the translated pages and illustrations, ready to be distributed.
+
+**Why we need `.jar` files:**
+You wouldn't want to email someone 500 individual `.class` files arranged in complex folder structures to share your application. A `.jar` provides a convenient, single-file distribution mechanism. Spring Boot takes this a step further by creating "Fat JARs" that also include the embedded Tomcat web server and all your external `.jar` dependencies (like Hibernate or MySQL drivers) inside your main `.jar`.
