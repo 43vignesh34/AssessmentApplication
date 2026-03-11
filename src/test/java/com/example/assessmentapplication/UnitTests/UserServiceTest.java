@@ -1,4 +1,4 @@
-package com.example.assessmentapplication.ServiceTest;
+package com.example.assessmentapplication.UnitTests;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
