@@ -67,6 +67,7 @@ class UserServiceTest {
         assertEquals(user1, user2);
     }
 
+    @Test
     void findByUsername_WhenUserDoesntExist() {
         // Arrange
         when(userRepository.findByUsername("Suresh")).thenReturn(null);
@@ -74,5 +75,20 @@ class UserServiceTest {
         User user = userService.findByUsername("Suresh");
         // Assert
         assertNull(user);
+    }
+
+    @Test
+    void registerUser_WhenUserIsRegistered() {
+        // Arrange
+        User user = new User();
+        user.setUsername("Vignesh");
+        user.setPassword("password");
+        user.setRole(Role.USER);
+
+        // Act
+        userService.registerUser(user);
+
+        // Assert
+        verify(userRepository, times(1)).save(user);
     }
 }
