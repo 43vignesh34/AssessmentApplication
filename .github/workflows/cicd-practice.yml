@@ -40,5 +40,24 @@ jobs:
             # | allows us to run multiple commands in one step
             - name: Run Integration Tests
               run: mvn verify -DskipUnitTests
+
+    deploy:
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+        needs: build-and-test
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            
+            - name: Deploy to AWS
+              uses: einaregilsson/beanstalk-deploy@v21
+              with:
+                aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                application_name: AssessmentApplication
+                environment_name: AssessmentApplication-env
+                version_label: "ver-${{ github.sha }}"
+                region: ap-southeast-2
     
         
