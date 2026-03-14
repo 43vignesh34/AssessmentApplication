@@ -23,14 +23,11 @@ jobs:
           java-version: "17"
           cache: "maven"
 
-      # Optional but nice: show Maven + Java versions in logs
-      - name: Show versions
-        run: |
-          java -version
-          mvn -version
 
       - name: Package JAR
         run: mvn -B package -DskipTests
+      #Actually this step runs unit tests by default but if this step fails
+      #we wont know whether it was the packaging or the unit tests that failed
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
