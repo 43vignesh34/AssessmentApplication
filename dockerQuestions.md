@@ -123,3 +123,30 @@ If we didn't use `--from=build`, Docker would try to find a `.jar` file on your 
 
 **Q8: When Docker hits the second `FROM` command in your Dockerfile, what exactly happens under the hood?**
 > **How to Answer:** "It throws away the entire filesystem of the first build stage. The Maven compiler, the downloaded dependencies, and the raw source code are completely discarded. Docker starts a brand new, microscopic container from scratch, based solely on the JRE image. Using `COPY --from=build` allows us to securely reach back into the previous stage and pull *only* the compiled executable into this clean environment."
+
+## Docker Containers vs Virtual Machines
+
+**Q: Does a Docker container have its own OS?**
+> A Docker container has the OS **filesystem** (directory structure, tools, libraries) but **NOT** its own **kernel**. It borrows the kernel from the host machine.
+
+**Q: What is the OS Kernel?**
+> The kernel is the core of the OS — the **middleman between programs and hardware**. When your Java app says "save this file to disk", it doesn't talk to the hard drive directly. It calls the kernel, which handles all low-level hardware communication. Think of it as the restaurant kitchen: you (the app) tell the waiter (kernel) what you want, and the kitchen handles the actual cooking (hardware access).
+
+**Q: What is the OS Filesystem?**
+> The filesystem is how the OS **organizes and stores files**. It defines the folder structure (`/bin`, `/usr`, `/etc`), where programs live, where config files are, and how file permissions work. In Docker, the base image (`FROM eclipse-temurin:17-jre`) provides the **filesystem**, while Docker Desktop provides the **kernel**.
+
+**Q: What is the difference between a Docker Container and a VM?**
+
+| Feature | VM | Docker Container |
+| :--- | :--- | :--- |
+| **Has its own Kernel?** | ✅ Yes | ❌ No (shares host kernel) |
+| **Startup time** | Minutes | Seconds |
+| **Size** | GBs (full OS) | MBs (just app + libraries) |
+| **Isolation** | Full hardware isolation | Process-level isolation |
+| **Best for** | Running different OSes | Running many app instances |
+
+> *Analogy:* A VM is like renting an entire apartment (its own power, plumbing, everything). A container is like renting a hotel room in the same building — your own private space, but you share the building's power and water (the kernel).
+
+**Q: Do the filesystem and kernel need to match?**
+> Yes! A **Linux filesystem** needs a **Linux kernel**, and a **Windows filesystem** needs a **Windows kernel**. On a Mac, Docker Desktop runs a hidden Linux VM to provide the Linux kernel for all your containers. This is why you use `runs-on: ubuntu-latest` in GitHub Actions — to ensure the Linux kernel is compatible with your Linux-based Docker images.
+
