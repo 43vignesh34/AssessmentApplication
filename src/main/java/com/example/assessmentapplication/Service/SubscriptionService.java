@@ -9,7 +9,6 @@ import com.example.assessmentapplication.exception.ResourceNotFoundException;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,20 +22,27 @@ import org.springframework.stereotype.Service;
  * - Lazy (with lambda): The exception is created ONLY if the value is missing.
  * This is more efficient.
  */
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class SubscriptionService {
 
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SubscriptionRepository subscriptionRepository;
+    private final UserRepository userRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     public Subscription createSubscription(int userId, Subscription subscription) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found!"));
+        log.info("Attempting to create subscription for user ID: {}", userId);
+        User user = userRepository.findById(userId).orElseThrow(() -> {
+            log.error("User ID {} not found while creating subscription!", userId);
+            return new ResourceNotFoundException("User not found!");
+        });
         subscription.setUser(user);
-        return subscriptionRepository.save(subscription); // The save method is a built-in method of JpaRepository. It
-                                                          // inserts a new row if the ID is null, or updates an existing
-                                                          // row if the ID is present.
+        Subscription saved = subscriptionRepository.save(subscription);
+        log.info("Subscription created successfully with ID: {}", saved.getId());
+        return saved;
     }
 
     public List<Subscription> getAllSubscriptions() {

@@ -8,15 +8,17 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
+import lombok.RequiredArgsConstructor;
+
 @RestController
+@RequiredArgsConstructor
 public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final MeterRegistry meterRegistry;
 
     @GetMapping("/getUser")
     public User getUser(@RequestParam("username") String username) {
@@ -27,5 +29,9 @@ public class UserController {
     @PostMapping("/register")
     public void registerUser(@RequestBody @Valid User user) {
         userService.registerUser(user);
+        Counter.builder("user.registration.success")
+                .description("Number of successful user registrations")
+                .register(meterRegistry)
+                .increment();
     }
 }
