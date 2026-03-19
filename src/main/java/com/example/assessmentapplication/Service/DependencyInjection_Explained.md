@@ -24,16 +24,68 @@ A large constructor is a visual "code smell" indicating that a class is doing to
 
 ---
 
-## The Lifecycle: When does Injection happen?
+## Spring Bean Lifecycle & @PostConstruct Deep Dive
 
-In Field Injection, the timing is critical to understand why it can lead to `NullPointerExceptions`.
+### 1. When are Fields Initialized?
+Fields are initialized **BEFORE** dependency injection occurs. This is a fundamental Java behavior, not specific to Spring:
+1.  **Memory Allocation**: The JVM allocates space for the object.
+2.  **Field Initialization**: Fields are given their default or explicit values (e.g., `private int x = 5;`).
+3.  **Constructor Execution**: The constructor runs.
 
-### The Timeline
-1.  **Instantiation**: Spring calls the constructor (`new MyClass()`). At this point, `@Autowired` fields are **null**.
-2.  **Population (Injection)**: Spring uses Reflection to inject the dependencies into the fields.
-3.  **Initialization**: Spring calls `@PostConstruct` methods.
+> [!IMPORTANT]
+> At field initialization time, Spring has **NOT** injected dependencies yet. If you try to use an `@Autowired` or `final` (but not yet set) field here, you will get a `NullPointerException`.
 
-### Why this matters
-Because the fields are injected **after** the constructor runs, you cannot use an injected dependency inside your constructor. If you try, the app will crash with a `NullPointerException`. 
+---
 
-With **Constructor Injection**, the dependency is available from Step 1, making the object "ready to use" the moment it exists.
+### 2. The Spring Bean Lifecycle (Step-by-Step)
+
+For a Spring Bean (like `UserController`):
+
+1.  **Step 1: Instantiation (Java)**: The object is created in memory. Fields are initialized, but dependencies are still **null**.
+2.  **Step 2: Constructor Injection**: Spring calls the constructor, passing the required dependencies as parameters. Now, dependencies are **available**.
+3.  **Step 3: Dependency Injection Complete**: Spring finished wiring the bean.
+4.  **Step 4: @PostConstruct Execution**: Spring calls any method marked with `@PostConstruct`. This is the **safe zone** for initialization logic that requires dependencies.
+5.  **Step 5: Bean Ready**: The bean is now fully functional and starts serving requests.
+6.  **Step 6: Destruction**: `@PreDestroy` methods run just before the application shuts down.
+
+---
+
+### 3. Why @PostConstruct is Essential
+It ensures that your initialization logic runs **ONLY AFTER**:
+- ✅ The Bean is created.
+- ✅ All dependencies are successfully injected.
+- ✅ The Bean is fully "ready for prime time."
+
+**Example (The "Safe" Way):**
+```java
+@PostConstruct
+public void init() {
+    this.userCounter = Counter.builder("user.count")
+        .description("Number of users")
+        .register(meterRegistry);
+}
+```
+
+---
+
+### 4. Correct Ways to Initialize Dependent Objects
+
+| Approach | When it Runs | Why use it? |
+| :--- | :--- | :--- |
+| **Constructor** | During creation. | Best for `final` fields and mandatory dependencies. |
+| **@PostConstruct** | After injection. | Best for complex setup that requires fully-wired dependencies. |
+
+---
+
+### 5. Summary Mental Model (The House Analogy)
+- **Fields**: The house structure is built (but empty).
+- **Constructor**: The furniture is delivered through the door.
+- **@PostConstruct**: The furniture is arranged and the house is ready to live in.
+
+---
+
+### 6. Interview "Cheat Sheet" Summary
+- **Fields** are initialized **before** injection (dependencies = null).
+- **Spring** injects dependencies during the **constructor** or immediately after (setter/field injection).
+- **@PostConstruct** is used for safe initialization after all wiring is complete.
+- **NEVER** use injected dependencies in field initializers or instance blocks.
