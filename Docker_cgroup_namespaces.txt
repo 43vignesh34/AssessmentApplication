@@ -1,0 +1,258 @@
+Great — now we’ll tie everything together **properly and deeply**, but still in a way you can **say confidently in an interview**.
+
+---
+
+# 🧠 First: One-line answer (anchor this)
+
+👉
+**Docker uses Linux kernel features called namespaces for isolation and cgroups for resource control to create containers.**
+
+---
+
+# 🧩 Step 1: What Docker actually does
+
+When you run:
+
+```bash
+docker run my-app
+```
+
+👉 Docker does **NOT create a VM**
+👉 It creates a **process on the host OS**
+
+BUT it modifies that process using kernel features so it *looks like a separate machine*
+
+---
+
+# 🔐 Step 2: Namespaces → Isolation
+
+## 🧠 Core idea
+
+👉 Namespaces give a process its **own view of the system**
+
+---
+
+## 💡 Without namespaces
+
+A process can see:
+
+* all processes
+* all files
+* all network interfaces
+
+👉 No isolation
+
+---
+
+## 💡 With namespaces
+
+Docker tells kernel:
+
+👉 “Create a process that sees its own world”
+
+---
+
+## 🔍 What gets isolated
+
+### 1. PID Namespace (Processes)
+
+* Container sees:
+
+  ```text
+  PID 1 → its own app
+  ```
+
+* But host may have:
+
+  ```text
+  PID 4567 → same process
+  ```
+
+👉 Container thinks it is the only process
+
+---
+
+### 2. NET Namespace (Networking)
+
+Each container gets:
+
+* its own IP
+* its own ports
+* its own network stack
+
+👉 That’s why:
+
+* multiple containers can use same port internally
+
+---
+
+### 3. MOUNT Namespace (Filesystem)
+
+* Container sees only:
+
+  * its own filesystem (image layers)
+
+👉 Cannot see host files unless mounted
+
+---
+
+### 4. UTS Namespace (Hostname)
+
+* Each container has its own hostname
+
+---
+
+### 5. IPC Namespace
+
+* Isolates communication between processes
+
+---
+
+## 🎯 Summary
+
+👉 Namespaces = **isolation layer**
+
+---
+
+# ⚙️ Step 3: cgroups → Resource Control
+
+## 🧠 Core idea
+
+👉 cgroups control **how much resources a container can use**
+
+---
+
+## 💡 Without cgroups
+
+One container can:
+
+* consume all memory
+* use all CPU
+* crash system
+
+---
+
+## 💡 With cgroups
+
+Docker tells kernel:
+
+👉 “Limit this process”
+
+---
+
+## 🔍 What can be controlled
+
+* CPU usage
+* Memory usage
+* Disk I/O
+* Network bandwidth
+
+---
+
+## 🧪 Example
+
+```bash
+docker run -m 512m --cpus=1 my-app
+```
+
+👉 Means:
+
+* max 512MB RAM
+* max 1 CPU
+
+---
+
+## 🎯 Summary
+
+👉 cgroups = **resource limits + monitoring**
+
+---
+
+# 🧩 Step 4: Combine Both (THIS IS THE MAGIC)
+
+When Docker creates a container:
+
+---
+
+## 🔹 Step 1: Create process
+
+* normal Linux process
+
+---
+
+## 🔹 Step 2: Apply namespaces
+
+👉 isolate:
+
+* processes
+* network
+* filesystem
+
+---
+
+## 🔹 Step 3: Apply cgroups
+
+👉 limit:
+
+* CPU
+* memory
+
+---
+
+## 🔹 Step 4: Attach filesystem (image layers)
+
+👉 container gets its own environment
+
+---
+
+# 🧠 Final Mental Model
+
+👉 A container is:
+
+> **A process + namespaces (isolation) + cgroups (limits)**
+
+---
+
+# 🔥 Why this makes Docker powerful
+
+Because:
+
+* No full OS needed
+* No hypervisor
+* No guest kernel
+
+👉 Uses host kernel directly
+
+---
+
+# ⚡ Why containers are lightweight
+
+* share kernel
+* no OS boot
+* minimal overhead
+
+---
+
+# 🎯 Interview Answer (Perfect Version)
+
+> “Docker uses Linux kernel features to implement containers. It uses namespaces to isolate resources such as processes, network, and filesystem, giving each container its own independent view of the system. It uses cgroups to control and limit resource usage such as CPU and memory. Together, these allow containers to run as isolated processes on the same host OS while sharing the kernel.”
+
+---
+
+# 🧠 Ultra Short Memory
+
+👉 Namespaces → isolation
+👉 cgroups → limits
+👉 Container = process + both
+
+---
+
+# 🚀 If you want next level (VERY IMPORTANT for YOU)
+
+I can now connect this to:
+
+👉 how Kubernetes enforces limits (requests/limits → cgroups)
+👉 how Docker maps ports internally
+👉 what happens inside `/proc` and `/sys/fs/cgroup`
+
+This is where you reach SDE-2 clarity 💪
