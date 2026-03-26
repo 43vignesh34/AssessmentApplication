@@ -58,3 +58,324 @@ If you change it to:
 `ENTRYPOINT java -jar app.jar` (Shell Form)
 
 The application will run *inside* a shell process. While this makes it "easier" to use environment variables in the command, it prevents the app from receiving shutdown signals correctly. **Stick to the Exec Form** and use `docker exec` when you need a shell.
+
+Great question — this is where your understanding becomes **system-level (very valuable for SDE interviews)**.
+
+You already know:
+👉 **Kernel = core of OS**
+
+Now let’s answer:
+
+> ❓ What else does an OS have besides the kernel?
+
+---
+
+# 🧠 One-line answer
+
+👉 **OS = Kernel + system libraries + utilities + user interface + services**
+
+---
+
+# 🧩 Big Picture
+
+```text
+User Apps
+   ↓
+OS (Libraries + Tools + UI)
+   ↓
+Kernel
+   ↓
+Hardware
+```
+
+---
+
+# 🔍 Components of an OS (other than kernel)
+
+We’ll go layer by layer 👇
+
+---
+
+# 🧩 1. System Libraries (VERY IMPORTANT)
+
+## 🧠 What are they?
+
+👉 Pre-written code that apps use to interact with the OS
+
+---
+
+## 💡 Examples
+
+* `libc` (C standard library)
+* file handling APIs
+* networking APIs
+
+---
+
+## 🔄 Example flow
+
+When you do:
+
+```c
+printf("Hello");
+```
+
+👉 It actually goes:
+
+```text
+App → libc → kernel → hardware
+```
+
+---
+
+## 🧠 Why important
+
+👉 Apps don’t directly talk to kernel
+👉 Libraries act as **middle layer**
+
+---
+
+# 🧩 2. System Utilities / Tools
+
+## 🧠 What are they?
+
+👉 Programs that help manage the system
+
+---
+
+## 💡 Examples
+
+* `ls`, `cp`, `mv`
+* `ps`, `top`
+* `bash`, `sh`
+* `systemctl`
+
+---
+
+## 🧠 Why important
+
+👉 These are what you interact with daily
+👉 Without them, OS is unusable
+
+---
+
+# 🧩 3. Shell (Command Interface)
+
+## 🧠 What is it?
+
+👉 Interface between user and OS
+
+---
+
+## 💡 Examples
+
+* Bash
+* Zsh
+* PowerShell
+
+---
+
+## 🔄 Example
+
+```bash
+ls
+```
+
+👉 Flow:
+
+```text
+User → Shell → OS → Kernel → Hardware
+```
+
+---
+
+# 🧩 4. Graphical User Interface (GUI)
+
+## 🧠 What is it?
+
+👉 Visual interface of OS
+
+---
+
+## 💡 Examples
+
+* Windows desktop
+* macOS UI
+* GNOME (Linux)
+
+---
+
+## 🧠 Why important
+
+👉 Makes OS user-friendly
+👉 Not required for servers
+
+---
+
+# 🧩 5. Device Drivers
+
+## 🧠 What are they?
+
+👉 Software that allows OS to communicate with hardware
+
+---
+
+## 💡 Examples
+
+* printer driver
+* GPU driver
+* network card driver
+
+---
+
+## 🧠 Why important
+
+👉 Kernel uses drivers to control hardware
+
+---
+
+# 🧩 6. File System
+
+## 🧠 What is it?
+
+👉 Structure used to store and organize files
+
+---
+
+## 💡 Examples
+
+* ext4 (Linux)
+* NTFS (Windows)
+* APFS (Mac)
+
+---
+
+## 🧠 Why important
+
+👉 Defines:
+
+* how data is stored
+* how files are accessed
+
+---
+
+# 🧩 7. System Services (Background processes)
+
+## 🧠 What are they?
+
+👉 Background processes that keep OS running
+
+---
+
+## 💡 Examples
+
+* networking service
+* logging service
+* scheduler
+* cron jobs
+
+---
+
+## 🧠 Why important
+
+👉 OS is not just kernel — it runs many services
+
+---
+
+# 🧩 8. Package Manager (Linux specific)
+
+## 🧠 What is it?
+
+👉 Tool to install software
+
+---
+
+## 💡 Examples
+
+* `apt` (Ubuntu)
+* `yum` (RHEL)
+* `apk` (Alpine)
+
+---
+
+## 🧠 Why important
+
+👉 This is how you install dependencies
+
+---
+
+# 🧠 Putting it all together
+
+👉 OS =
+
+```text
+Kernel
++ Libraries
++ Utilities
++ Shell
++ Drivers
++ File system
++ Services
++ UI
+```
+
+---
+
+# 🔥 Now connect to Docker (VERY IMPORTANT)
+
+👉 Docker images include:
+
+✔ libraries
+✔ utilities
+✔ filesystem
+
+❌ kernel
+
+---
+
+👉 That’s why:
+
+```dockerfile
+FROM ubuntu
+```
+
+👉 is NOT a full OS
+
+👉 It’s just:
+
+* OS userspace (everything except kernel)
+
+---
+
+# 🎯 Interview Answer
+
+> “An operating system consists of more than just the kernel. It includes system libraries that provide APIs to applications, utilities and command-line tools, a shell or GUI for user interaction, device drivers for hardware communication, file system management, and background services. The kernel is the core, but the OS as a whole provides a complete environment for running applications.”
+
+---
+
+# 🧠 Ultra simple memory
+
+👉 Kernel = core
+👉 OS = core + tools + libraries + interface
+
+---
+
+# 🔥 Final insight (VERY IMPORTANT)
+
+👉 OS = **kernel + userspace**
+
+👉 Docker images = **userspace only**
+
+👉 Containers = **userspace + shared kernel**
+
+---
+
+# 🚀 If you want next level
+
+I can show you:
+
+👉 exact folder structure of Linux OS (`/bin`, `/lib`, `/etc`)
+👉 how Docker images mimic OS without kernel
+👉 why Alpine behaves differently than Ubuntu
+
+This is where everything clicks 💪
