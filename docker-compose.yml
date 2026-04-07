@@ -32,6 +32,10 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/userdb
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=V1gnesh@123
+    networks:
+      - app-network
+    volumes:
+      - ./logs:/logs
 
     # RESOURCE LIMITS: Protecting the Host Machine
     # Without these, a memory leak here could consume 100% of your Mac's RAM, causing an OOM (Out Of Memory) crash
@@ -58,6 +62,8 @@ services:
       #(Notice it matches the userdb name we told Spring Boot to look for!)
       - MYSQL_DATABASE=userdb
       - MYSQL_ROOT_PASSWORD=V1gnesh@123 #Matches the root user password we put in Spring Boot's application.properties
+    networks:
+      - app-network
 
     # VOLUME MAPPING: (SOURCE : DESTINATION)
     # 1. Left side (db_data): The safe, permanent folder living outside the container on the host machine.
@@ -82,8 +88,39 @@ services:
       # Allow 5 consecutive failures before officially marking the container as "unhealthy"
       retries: 5
 
+  loki:
+    image: grafana/loki:latest
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - app-network
+
+  promtail:
+    image: grafana/promtail:latest
+    volumes:
+      - ./logs:/var/log
+    # Promtail needs a config file. For now, we'll just define the service.
+    # In a real setup, you'd mount a config.yml here.
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - app-network
+
 # Declare the volume so Docker knows to manage it automatically.
 # This ensures that even if you run `docker-compose down` and destroy the containers,
 # your database data survives in this isolated volume.
 volumes:
   db_data:
+
+
+networks:
+  app-network:
+    driver: bridge

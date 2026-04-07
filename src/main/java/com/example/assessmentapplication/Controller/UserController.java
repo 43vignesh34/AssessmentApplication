@@ -38,6 +38,7 @@ public class UserController {
 
     @PostMapping("/register")
     public void registerUser(@RequestBody @Valid User user) {
+        log.info("Processing registration request for user: {}", user.getUsername());
         userService.registerUser(user);
         userCounter.increment();
     }
