@@ -10,11 +10,10 @@
 [INFO] Copying 1 resource from src/main/resources to target/classes
 [INFO] 
 [INFO] --- compiler:3.14.1:compile (default-compile) @ AssessmentApplication ---
-[INFO] Recompiling the module because of added or removed source files.
-[INFO] Compiling 16 source files with javac [debug parameters release 17] to target/classes
+[INFO] Nothing to compile - all classes are up to date.
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  1.018 s
-[INFO] Finished at: 2026-04-12T13:14:49+05:30
+[INFO] Total time:  0.424 s
+[INFO] Finished at: 2026-04-12T14:07:28+05:30
 [INFO] ------------------------------------------------------------------------

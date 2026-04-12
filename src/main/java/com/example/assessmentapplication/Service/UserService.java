@@ -17,9 +17,12 @@ public class UserService {
 
     private final UserRepository repo;
     private final Counter userCounter;
+    private final org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository repo, MeterRegistry meterRegistry) {
+    public UserService(UserRepository repo, MeterRegistry meterRegistry,
+            org.springframework.security.crypto.password.PasswordEncoder passwordEncoder) {
         this.repo = repo;
+        this.passwordEncoder = passwordEncoder;
         this.userCounter = Counter.builder("user.registered.count")
                 .description("Number of users registered")
                 .register(meterRegistry);
@@ -31,7 +34,7 @@ public class UserService {
             log.info("No users found. Creating default admin...");
             User admin = new User();
             admin.setUsername("admin1");
-            admin.setPassword("default");
+            admin.setPassword(passwordEncoder.encode("default"));
             admin.setRole(com.example.assessmentapplication.entity.Role.ADMIN);
             repo.save(admin);
         }
@@ -43,12 +46,8 @@ public class UserService {
     }
 
     public void registerUser(User user) {
-        // Why {} instead of +?
-        // Parameterized logging (using {}) only builds the string if the log level is
-        // active (e.g. INFO).
-        // The + version (concatenation) always spends CPU time building the string,
-        // even if the log is never printed.
         log.info("User successfully registered: {}", user.getUsername());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userCounter.increment();
         repo.save(user);
     }

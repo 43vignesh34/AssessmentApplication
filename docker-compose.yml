@@ -43,12 +43,11 @@ services:
     deploy:
       resources:
         limits:
-          # Hard limit: The container will crash/throttle if it tries to use more than this
           cpus: '0.5'
           memory: 512M
-      reservations:
-        cpus: '0.2'
-        memory: 256M
+        reservations:
+          cpus: '0.2'
+          memory: 256M
 
   mysqldb:
     #We dont use build because we are not building a custom image for MySQL. 
@@ -100,8 +99,8 @@ services:
     image: grafana/promtail:latest
     volumes:
       - ./logs:/var/log
-    # Promtail needs a config file. For now, we'll just define the service.
-    # In a real setup, you'd mount a config.yml here.
+      - ./promtail-config.yml:/etc/promtail/config.yml
+    command: -config.file=/etc/promtail/config.yml
     networks:
       - app-network
 
