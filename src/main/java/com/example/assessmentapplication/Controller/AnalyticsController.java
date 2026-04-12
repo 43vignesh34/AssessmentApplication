@@ -23,14 +23,27 @@ public class AnalyticsController {
 
     @GetMapping("/upcomingRenewals/{userId}")
     public List<Subscription> getUpcomingRenewals(@PathVariable int userId) {
-        log.info("Fetching upcoming renewals for user ID: {}", userId);
-        return subscriptionService.getUpcomingRenewals(userId);
+        log.info("[ANALYTICS] Request received: Fetching upcoming renewals for user ID: {}", userId);
+        long startTime = System.currentTimeMillis();
+
+        List<Subscription> result = subscriptionService.getUpcomingRenewals(userId);
+
+        long duration = System.currentTimeMillis() - startTime;
+        log.info("[ANALYTICS] Request completed in {}ms. Found {} renewals for user: {}", duration, result.size(),
+                userId);
+        return result;
     }
 
     @GetMapping("/totalAmount/{userId}")
     public java.math.BigDecimal getTotalAmount(@PathVariable int userId) {
-        log.info("Calculating total subscription amount for user ID: {}", userId);
-        return subscriptionService.calculateTotalAmount(userId);
+        log.info("[ANALYTICS] Request received: Calculating total subscription amount for user ID: {}", userId);
+        long startTime = System.currentTimeMillis();
+
+        java.math.BigDecimal amount = subscriptionService.calculateTotalAmount(userId);
+
+        long duration = System.currentTimeMillis() - startTime;
+        log.info("[ANALYTICS] Request completed in {}ms. Total amount for user {}: {}", duration, userId, amount);
+        return amount;
     }
 
 }

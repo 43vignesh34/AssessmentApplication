@@ -23,7 +23,7 @@ jobs:
           java-version: "17"
           cache: "maven"
 
-      # Optional but nice: show Maven + Java versions in logs
+
       - name: Show versions
         run: |
           java -version
